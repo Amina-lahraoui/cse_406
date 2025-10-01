@@ -1,0 +1,16 @@
+{
+    "index": {
+        "location": "Hanyang University, Seoul, South Korea",
+        "course": "Software Engineering",
+        "description": "Innovative smart solution for LG products, enabling automatic and intelligent waste sorting with a simple scan",
+        "features": {
+            "scan": "Automatic Scan",
+            "sort": "Smart Sorting",
+            "integration": "IoT Integration"
+        },
+        "cta": "Start",
+        "common": {
+            "loading" : "Loading ..."
+        }
+    }
+}

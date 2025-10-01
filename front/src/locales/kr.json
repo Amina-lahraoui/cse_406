@@ -1,0 +1,16 @@
+{
+    "index": {
+        "location": "한양대학교, 서울, 한국",
+        "course": "소프트웨어공학",
+        "description": "스캔 한 번으로 자동화되고 지능적인 폐기물 분류를 가능하게 하는, LG 제품을 위한 혁신적인 스마트 솔루션",
+        "features": {
+            "scan": "자동 스캔",
+            "sort": "지능형 분류",
+            "integration": "IoT 통합"
+        },
+        "cta": "시작",
+        "common": {
+            "loading" : "로드 중..."
+        }
+    }
+}
