@@ -1,9 +1,8 @@
-
 import { useState, useEffect } from 'react';
 import { useTranslation } from "react-i18next";
 import { MapPin, Languages } from 'lucide-react';
 
-const Exec = () => {
+export default function Loading() {
   const { t, i18n } = useTranslation();
   const [isDarkTheme, setIsDarkTheme] = useState(true);
   const [showLoader, setShowLoader] = useState(false);
@@ -123,5 +122,3 @@ const Exec = () => {
     </>
   );
 };
-
-export default Exec;

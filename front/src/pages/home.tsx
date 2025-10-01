@@ -74,7 +74,7 @@ export default function Home() {
  
           <div className={`transition-all duration-1000 delay-800 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <button 
-              onClick={() => navigate("/exec")}
+              onClick={() => navigate("/loading")}
               className="group inline-flex items-center px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold rounded-full text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <span>{t("index.cta")}</span>
