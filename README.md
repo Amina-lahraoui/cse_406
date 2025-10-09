@@ -5,7 +5,8 @@ Intelligent automatic waste sorting system.
 ```
 /cse_406
 │── front/                     # App public : vite.js react typescript tailwind i18n 
-│── back/                      # ?
+│── back/                      # API : FastAPI Python 
+│── ai/.                       # Module AI 
 │── doc/                       # Documentation 
 │── docker-compose.dev.yml     # Environment development (hot reload)
 │── docker-compose.dev.yml     # Environment production (optimized build)
