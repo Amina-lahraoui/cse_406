@@ -10,19 +10,47 @@ services:
       - /app/node_modules
     environment:
       - CHOKIDAR_USEPOLLING=true
+      - VITE_API_URL=http://localhost:8000
     command: npm run dev -- --host 0.0.0.0
-    # depends_on:
-    #   - back
+    depends_on:
+      - back
+    networks:
+      - app-network
 
-  # back:
-  #   build:
-  #     context: ./back
-  #     dockerfile: Dockerfile.dev
-  #   ports:
-  #     - "8000:8000"
-  #   volumes:
-  #     - ./back:/app
-  #     - ./db:/app/db
-  #   environment:
-  #     - DATABASE_URL=sqlite:///./app.db
-  #   command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+  back:
+    build:
+      context: ./back
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./back:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+      - DATABASE_URL=postgresql://user:password@db:5432/mydb
+    depends_on:
+      - db
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mydb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    networks:
+      - app-network
+
+volumes:
+  postgres_data:
+
+networks:
+  app-network:
+    driver: bridge
