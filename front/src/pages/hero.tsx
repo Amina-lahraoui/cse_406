@@ -3,16 +3,16 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { ChevronRight, Scan, Recycle, Cpu, Users, MapPin, Languages } from 'lucide-react';
 
-export default function Home() {
+export default function Hero() {
   const { t, i18n } = useTranslation();
-  const navigate = useNavigate();
-  const [isVisible, setIsVisible] = useState(false);
-  const [currentFeature, setCurrentFeature] = useState(0);
-
   const toggleLanguage = () => {
     const newLang = i18n.language === "en" ? "kr" : "en";
     i18n.changeLanguage(newLang);
   };
+
+  const navigate = useNavigate();
+  const [isVisible, setIsVisible] = useState(false);
+  const [currentFeature, setCurrentFeature] = useState(0);
 
   useEffect(() => {
     setIsVisible(true);
@@ -23,9 +23,9 @@ export default function Home() {
   }, []);
 
   const features = [
-    { icon: <Scan className="w-8 h-8" />, text: t("index.features.scan") },
-    { icon: <Recycle className="w-8 h-8" />, text: t("index.features.sort") },
-    { icon: <Cpu className="w-8 h-8" />, text: t("index.features.integration") }
+    { icon: <Scan className="w-8 h-8" />, text: t("hero.features.scan") },
+    { icon: <Recycle className="w-8 h-8" />, text: t("hero.features.sort") },
+    { icon: <Cpu className="w-8 h-8" />, text: t("hero.features.integration") }
   ];
 
   return (
@@ -41,7 +41,7 @@ export default function Home() {
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2 text-white/80">
               <MapPin className="w-4 h-4" />
-              <span className="text-sm">{t("index.location")}</span>
+              <span className="text-sm">{t("header.location")}</span>
             </div>
           </div>
           <div className="flex items-center text-white/80 px-3 py-2 rounded-full p-1 hover:bg-white/5">
@@ -69,15 +69,16 @@ export default function Home() {
           </h1>
           
           <p className={`text-md md:text-2xl text-white/80 mb-12 max-w-4xl mx-auto leading-relaxed transition-all duration-1000 delay-400 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-            {t("index.description")}
+            {t("hero.description")}
           </p>
  
+          {/* components a utiliser ? */}
           <div className={`transition-all duration-1000 delay-800 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <button 
               onClick={() => navigate("/loading")}
               className="group inline-flex items-center px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold rounded-full text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <span>{t("index.cta")}</span>
+              <span>{t("hero.cta")}</span>
               <ChevronRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
             </button>
           </div>
@@ -104,7 +105,7 @@ export default function Home() {
 
           <div className={`inline-flex items-center px-4 py-2 space-x-2 sm:bg-white/10 backdrop-blur-sm rounded-full sm:border sm:border-white/20 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'} max-w-full`}>
             <p className="flex flex-col md:flex-row md:justify-center md:space-x-2 text-sm md:text-md text-white/80 leading-relaxed transition-all">
-              <span className="text-center md:text-left">{t("index.course")} (CSE406) : </span>
+              <span className="text-center md:text-left">{t("hero.course")} (CSE406) : </span>
               <div className="flex items-center justify-center space-x-2 text-white/90 mt-1 md:mt-0">
                 <Users className="hidden md:block w-4 h-4 flex-shrink-0" />
                 <span className="text-xs md:text-sm text-center">

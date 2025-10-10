@@ -1,6 +1,8 @@
 {
-    "index": {
-        "location": "Hanyang University, Seoul, South Korea",
+    "header": {
+        "location": "Hanyang University, Seoul, South Korea"
+    },
+    "hero": {
         "course": "Software Engineering",
         "description": "Innovative smart solution for LG products, enabling automatic and intelligent waste sorting with a simple scan",
         "features": {
@@ -11,6 +13,27 @@
         "cta": "Start",
         "common": {
             "loading" : "Loading ..."
+        }
+    },
+    "auth": {
+        "login": "Login",
+        "email": "Email",
+        "password": "Password",
+        "submit": "Sign In",
+        "noAccount": "Don't have an account?",
+        "signin": "Sign up",
+        "forgot": "Forgot your password?",
+        "reset": "Reset it",
+        "skipAuth": "Skip",
+        "errors": {
+            "emailRequired": "Email is required",
+            "emailInvalid": "Please enter a valid email address",
+            "passwordRequired": "Password is required",
+            "passwordTooShort": "Password must be at least 8 characters long",
+            "passwordWeak": "Password must include at least one uppercase letter, one lowercase letter, one number, and one special character",
+            "authFailed": "Invalid email or password",
+            "form": "An error occurred. Please try again",
+            "connectionError": "Connection error. Please check your internet connection"
         }
     }
 }

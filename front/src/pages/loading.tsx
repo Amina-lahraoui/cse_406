@@ -4,14 +4,14 @@ import { MapPin, Languages } from 'lucide-react';
 
 export default function Loading() {
   const { t, i18n } = useTranslation();
-  const [isDarkTheme, setIsDarkTheme] = useState(true);
-  const [showLoader, setShowLoader] = useState(false);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-
   const toggleLanguage = () => {
     const newLang = i18n.language === "en" ? "kr" : "en";
     i18n.changeLanguage(newLang);
   };
+
+  const [isDarkTheme, setIsDarkTheme] = useState(true);
+  const [showLoader, setShowLoader] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
     const loadingTimer = setTimeout(() => {
@@ -112,12 +112,13 @@ export default function Loading() {
         </header>
 
         {showLoader && (
-        <div className="fixed inset-0 flex items-center justify-center">
-          <div className="text-center">
-            <div className="loader mb-4"></div>
-            <p className={`${isDarkTheme ? 'text-white/80 hover:bg-white/5' : 'text-gray-700 hover:bg-black/5'} text-lg`}>{t("index.common.loading")}</p>
+          <div className="fixed inset-0 flex items-center justify-center">
+            <div className="text-center">
+              <div className="loader mb-4"></div>
+              <p className={`${isDarkTheme ? 'text-white/80 hover:bg-white/5' : 'text-gray-700 hover:bg-black/5'} text-lg`}>{t("index.common.loading")}</p>
+            </div>
           </div>
-        </div>)}
+        )}
       </div>
     </>
   );
