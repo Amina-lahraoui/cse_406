@@ -31,6 +31,7 @@
             "passwordRequired": "Password is required",
             "passwordTooShort": "Password must be at least 8 characters long",
             "passwordWeak": "Password must include at least one uppercase letter, one lowercase letter, one number, and one special character",
+            "limitRequest" : "Too many attempts, try again after 5 minutes",
             "authFailed": "Invalid email or password",
             "form": "An error occurred. Please try again",
             "connectionError": "Connection error. Please check your internet connection"

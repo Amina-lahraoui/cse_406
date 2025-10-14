@@ -67,10 +67,12 @@ export default function Auth() {
 
             try {
                 const result = await authServices.login(auth.email, auth.password);
-                if (result.status === 201 && result.data) {
-                    const userLanguage = result.data.user.language;
-                    if (userLanguage && userLanguage !== i18n.language) i18n.changeLanguage(userLanguage);
 
+                if (result.success) {
+                    if (result.data?.user) {
+                        localStorage.setItem('user', JSON.stringify(result.data.user));
+                        if (result.data.user.language) i18n.changeLanguage(result.data.user.language);
+                    }
                     showNotification(t("auth.success"), "success");
                     setTimeout(() => {
                         navigate("/home");
@@ -78,6 +80,8 @@ export default function Auth() {
                 } else {
                     if (result.status === 401) {
                         showNotification(t("auth.errors.authFailed"), "error");
+                    } else if (result.status === 429) {
+                        showNotification(t("auth.errors.limitRequest"), "error");
                     } else {
                         showNotification(result.error || t("auth.errors.form"), "error");
                     }

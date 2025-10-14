@@ -75,7 +75,7 @@ export default function Hero() {
           {/* components a utiliser ? */}
           <div className={`transition-all duration-1000 delay-800 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <button 
-              onClick={() => navigate("/loading")}
+              onClick={() => navigate("/auth")}
               className="group inline-flex items-center px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold rounded-full text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <span>{t("hero.cta")}</span>
@@ -105,11 +105,11 @@ export default function Hero() {
 
           <div className={`inline-flex items-center px-4 py-2 space-x-2 sm:bg-white/10 backdrop-blur-sm rounded-full sm:border sm:border-white/20 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'} max-w-full`}>
             <p className="flex flex-col md:flex-row md:justify-center md:space-x-2 text-sm md:text-md text-white/80 leading-relaxed transition-all">
-              <span className="text-center md:text-left">{t("hero.course")} (CSE406) : </span>
+              <span className="text-center lg:text-left">{t("hero.course")} (CSE406) : </span>
               <div className="flex items-center justify-center space-x-2 text-white/90 mt-1 md:mt-0">
                 <Users className="hidden md:block w-4 h-4 flex-shrink-0" />
                 <span className="text-xs md:text-sm text-center">
-                  Léo BELARBI - Amina LAHRAOUI - Daniel VAUGHN - Henrik LAM
+                  Léo BELARBI - Amina LAHRAOUI - Vaughn SIBURIAN - Henrik LAM - Shajnin HOWLADER
                 </span>
               </div>
             </p>

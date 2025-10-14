@@ -21,7 +21,7 @@ export default function Notification({ message, type, isVisible, onClose, durati
   
   if (!isVisible) return null;
 
-  const baseClasses = "fixed top-4 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg transform transition-all duration-300 ease-in-out";
+  const baseClasses = "fixed top-14 right-4 z-50 flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg transform transition-all duration-300 ease-in-out";
   
   const typeClasses = {
     success: "bg-green-100 border border-green-400 text-green-700 dark:bg-green-900 dark:border-green-800 dark:text-green-100",

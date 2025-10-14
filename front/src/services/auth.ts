@@ -1,56 +1,54 @@
-const API_URL = "http://localhost:8000";
-
-interface AuthResponse {
-    message: string;
-    user: {
-        id: number;
-        language: string;
-    };
-}
+const API_URL = "http://localhost:8000"; 
 
 export const authServices = {
-    async login(email: string, password: string): Promise<{ status: number; data?: AuthResponse; error?: string }> {
+    login: async (email: string, password: string) => {
         try {
             const response = await fetch(`${API_URL}/auth/login`, {
                 method: "POST",
-                headers: {"Content-Type": "application/json"},
+                headers: {
+                    "Content-Type": "application/json",
+                },
                 credentials: "include",
-                body: JSON.stringify({email, password}),
+                body: JSON.stringify({ email, password }),
             });
 
             const data = await response.json();
 
             if (!response.ok) {
                 return {
+                    success: false,
                     status: response.status,
-                    error: data.detail || "Connection error",
+                    error: data.detail || "Authentication failed",
                 };
             }
 
             return {
-                status: response.status,
-                data,
+                success: true,
+                data: data,
             };
         } catch (error) {
             return {
-                status: 500,
-                error: "Server connection error",
+                success: false,
+                error: "Connection error",
             };
         }
     },
 
-    async logout(): Promise<void> {
+    logout: async () => {
         try {
-            await fetch(`${API_URL}/auth/logout`, {
+            const response = await fetch(`${API_URL}/auth/logout`, {
                 method: "POST",
                 credentials: "include",
             });
+            
+            localStorage.removeItem('user');
+            return response.ok;
         } catch (error) {
-            console.error("Error during disconnection:", error);
+            return false;
         }
     },
 
-    async getCurrentUser(): Promise<{ status: number; user?: any; error?: string }> {
+    getCurrentUser: async () => {
         try {
             const response = await fetch(`${API_URL}/users/me`, {
                 method: "GET",
@@ -59,6 +57,7 @@ export const authServices = {
 
             if (!response.ok) {
                 return {
+                    success: false,
                     status: response.status,
                     error: "Not authenticated",
                 };
@@ -66,12 +65,13 @@ export const authServices = {
 
             const user = await response.json();
             return {
+                success: true,
                 status: response.status,
-                user,
+                data: user
             };
         } catch (error) {
             return {
-                status: 500,
+                success: false,
                 error: "Connection error",
             };
         }

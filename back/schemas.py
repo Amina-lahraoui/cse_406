@@ -13,23 +13,16 @@ class UserUpdate(BaseModel):
     password: Optional[str] = None
     language: Optional[str] = None
 
-class UserAuth(BaseModel):
-    email: EmailStr
-    password: str
-    
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "email": "user@example.com",
-                "password": "motdepasse123"
-            }
-        }
-
 class UserResponse(UserBase):
     id: int
+    language: str
     
     class Config:
         from_attributes = True
+
+class LoginRequest(BaseModel):
+    email: EmailStr
+    password: str
 
 class TokenResponse(BaseModel):
     access_token: str
