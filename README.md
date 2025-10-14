@@ -1,6 +1,6 @@
-# Smart snorting
+# Smart sorting (to change)
 
-Intelligent automatic waste sorting system.
+Intelligent automatic waste sorting system. (to change)
 
 ```
 /cse_406
