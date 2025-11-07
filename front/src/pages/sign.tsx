@@ -1,23 +1,21 @@
-"use client";
-
 import { useState } from "react";
-import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/context/AuthContext";
 import { useNotification } from "@/hooks";
-import { Error, Input, Button, Notification } from "@/components";
+import { Input, Button, Notification } from "@/components";
 import { MapPin, Languages } from "lucide-react";
 
-export default function Auth() {
+export default function SignupPage() {
     const navigate = useNavigate();
     const { t, i18n } = useTranslation();
     const toggleLanguage = () => {
         const newLang = i18n.language === "en" ? "kr" : "en";
         i18n.changeLanguage(newLang);
     };
-    
-    const { login } = useAuth();
-    const [auth, setAuth] = useState({ email: '', password: '' });
+
+    const { signup } = useAuth();
+    const [formData, setFormData] = useState({name: "",email: "",password: "",confirmPassword: ""});
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     
@@ -25,32 +23,61 @@ export default function Auth() {
     
     const validate = () => {
         let validationErrors: Record<string, string> = {};
-        
-        if (!auth.email.trim()) validationErrors.email = t("auth.errors.emailRequired");
-        if (!auth.password) validationErrors.password = t("auth.errors.passwordRequired");
-        
+
+        if (!formData.name.trim()) {
+            validationErrors.name = t("auth.errors.nameRequired");
+        }
+
+        if (!formData.email.trim()) {
+            validationErrors.email = t("auth.errors.emailRequired");
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+            validationErrors.email = t("auth.errors.emailInvalid");
+        }
+
+        if (!formData.password) {
+            validationErrors.password = t("auth.errors.passwordRequired");
+        } else if (formData.password.length < 8) {
+            validationErrors.password = t("auth.errors.passwordTooShort");
+        } else if (
+            !/(?=.*[a-z])/.test(formData.password) ||
+            !/(?=.*[A-Z])/.test(formData.password) ||
+            !/(?=.*\d)/.test(formData.password) ||
+            !/(?=.*[!@#$%^&*(),.?":{}|<>])/.test(formData.password)
+        ) {
+            validationErrors.password = t("auth.errors.passwordWeak");
+        }
+
+        if (!formData.confirmPassword) {
+            validationErrors.confirmPassword = t("auth.errors.confirmPasswordRequired");
+        } else if (formData.password !== formData.confirmPassword) {
+            validationErrors.confirmPassword = t("auth.errors.passwordMismatch");
+        }
+
         return validationErrors;
     };
-    
+
     const submit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const validationErrors = validate();
         setErrors(validationErrors);
-        
+
         if (Object.keys(validationErrors).length === 0) {
             setIsSubmitting(true);
-            
+
             try {
-                const result = await login(auth.email, auth.password);
-                
+                const result = await signup(formData.email, formData.password, formData.name);
+
                 if (result.success) {
-                    if (result.data?.language) i18n.changeLanguage(result.data.language);
+                    if (result.data?.language) {
+                        i18n.changeLanguage(result.data.language);
+                    }
+                    showNotification(t("auth.signupSuccess"), "success"); // Add
                     setTimeout(() => {
                         navigate("/home");
                     }, 1000);
                 } else {
-                    if (result.status === 401) {
-                        showNotification(t("auth.errors.authFailed"), "error");
+                    if (result.status === 409) {
+                        showNotification(t("auth.errors.emailExists"), "error");
                     } else if (result.status === 429) {
                         showNotification(t("auth.errors.limitRequest"), "error");
                     } else {
@@ -64,11 +91,11 @@ export default function Auth() {
             }
         }
     };
-    
+
     const change = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
-        setAuth(prev => ({ ...prev, [name]: value }));
-        if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
+        setFormData((prev) => ({ ...prev, [name]: value }));
+        if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
     };
 
     return (
@@ -109,15 +136,26 @@ export default function Auth() {
 
             <div className="relative z-10 flex items-center justify-center px-6 h-[calc(100vh-80px)]">
                 <div className="w-full max-w-md p-8 space-y-6 rounded-2xl shadow-2xl backdrop-blur-sm bg-white/90 dark:bg-gray-800/90 text-gray-900 dark:text-white">
-                    {/* <h1 className="text-3xl font-bold text-center">{t("login")}</h1> */}
                     <form className="space-y-4" onSubmit={submit} noValidate>
+                        <div>
+                            <Input
+                                label={t("auth.name")} // Add
+                                name="name"
+                                id="name"
+                                type="text"
+                                value={formData.name}
+                                onChange={change}
+                                error={errors.name}
+                                required
+                            />
+                        </div>
                         <div>
                             <Input
                                 label={t("auth.email")}
                                 name="email"
                                 id="email"
                                 type="email"
-                                value={auth.email ?? ""}
+                                value={formData.email}
                                 onChange={change}
                                 error={errors.email}
                                 required
@@ -129,9 +167,21 @@ export default function Auth() {
                                 name="password"
                                 id="password"
                                 type="password"
-                                value={auth.password ?? ""}
+                                value={formData.password}
                                 onChange={change}
                                 error={errors.password}
+                                required
+                            />
+                        </div>
+                        <div>
+                            <Input
+                                label={t("auth.confirmPassword")} // Add
+                                name="confirmPassword"
+                                id="confirmPassword"
+                                type="password"
+                                value={formData.confirmPassword}
+                                onChange={change}
+                                error={errors.confirmPassword}
                                 required
                             />
                         </div>
@@ -143,28 +193,18 @@ export default function Auth() {
                             disabled={isSubmitting}
                             loading={isSubmitting}
                         >
-                            {t("auth.submit")}
+                            {t("auth.signupSubmit")} 
+                            {/* Add */}
                         </Button>
-                        <Button
-                            type="submit"
-                            variant="secondary"
-                            size="sm"
-                            fullWidth
-                            onClick={() => navigate("./home")}
-                            disabled={isSubmitting}
-                            loading={isSubmitting}
-                        >
-                            {t("auth.skipAuth")}
-                        </Button>
-                        {errors.submit && <Error message={errors.submit} />}
                     </form>
 
                     <div className="space-y-2">
                         <p className="text-center text-sm">
-                            {t("auth.noAccount")} <a onClick={() => navigate("../sign")} className="text-emerald-500 hover:underline font-medium cursor-pointer">{t("auth.signin")}</a>
-                        </p>
-                        <p className="text-center text-sm">
-                            {t("auth.forgot")} <a onClick={() => navigate("../forgot")} className="text-emerald-500 hover:underline font-medium cursor-pointer">{t("auth.reset")}</a>
+                            {t("auth.haveAccount")}{" "}
+                            {/* Add */}
+                            <a onClick={() => navigate("../auth")} className="text-emerald-500 hover:underline font-medium cursor-pointer">
+                                {t("auth.login")}
+                            </a>
                         </p>
                     </div>
                 </div>

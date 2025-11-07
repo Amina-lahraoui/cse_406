@@ -6,15 +6,18 @@ class UserBase(BaseModel):
     language: Optional[str] = "en"
 
 class UserCreate(UserBase):
+    name: str
     password: str
 
 class UserUpdate(BaseModel):
+    name: Optional[str] = None
     email: Optional[EmailStr] = None
     password: Optional[str] = None
     language: Optional[str] = None
 
 class UserResponse(UserBase):
     id: int
+    name: str
     language: str
     
     class Config:

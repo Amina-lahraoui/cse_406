@@ -85,6 +85,7 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     hashed_password = pwd_context.hash(user.password)
     
     db_user = models.User(
+        name=user.name,
         email=user.email,
         hashed_password=hashed_password,
         language=user.language or "en"
@@ -99,10 +100,12 @@ def get_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     users = db.query(models.User).offset(skip).limit(limit).all()
     return users
 
-@app.get("/users/me")
+@app.get("/users/me", response_model=schemas.UserResponse)
 def get_current_user_info(current_user: models.User = Depends(get_current_user_from_cookie)):
     return {
         "id": current_user.id,
+        "email": current_user.email,
+        "name": current_user.name,
         "language": current_user.language
     }
 
@@ -144,7 +147,7 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
 limiter = Limiter(key_func=get_remote_address)
 @app.post("/auth/login", response_model=schemas.TokenResponse)
 @limiter.limit("5/minute")
-def login(credentials: schemas.LoginRequest, response: Response, db: Session = Depends(get_db)):
+def login(request: Request, credentials: schemas.LoginRequest, response: Response, db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.email == credentials.email).first()
     
     if not user or not pwd_context.verify(credentials.password, user.hashed_password):
@@ -171,6 +174,7 @@ def login(credentials: schemas.LoginRequest, response: Response, db: Session = D
         user=schemas.UserResponse(
             id=user.id,
             email=user.email,
+            name=user.name, 
             language=user.language
         )
     )

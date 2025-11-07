@@ -4,15 +4,40 @@ import { useNavigate } from "react-router-dom";
 import { ChevronRight, Scan, Recycle, Cpu, Users, MapPin, Languages } from 'lucide-react';
 
 export default function Hero() {
+  const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const toggleLanguage = () => {
     const newLang = i18n.language === "en" ? "kr" : "en";
     i18n.changeLanguage(newLang);
   };
-
-  const navigate = useNavigate();
+  
+  const [isDarkTheme, setIsDarkTheme] = useState(true);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+
   const [currentFeature, setCurrentFeature] = useState(0);
+  const features = [
+    { icon: <Scan className="w-8 h-8" />, text: t("hero.features.scan") },
+    { icon: <Recycle className="w-8 h-8" />, text: t("hero.features.sort") },
+    { icon: <Cpu className="w-8 h-8" />, text: t("hero.features.integration") }
+  ];
+
+  const handleAuth = () => {
+    setTimeout(() => {
+      setTimeout(() => {
+        setIsTransitioning(true);
+        setTimeout(() => {
+          setIsDarkTheme(false);
+          setTimeout(() => {
+            setIsTransitioning(false);
+            setTimeout(() => {
+              navigate("/auth");
+            }, 200);
+          }, 100);
+        }, 500);
+      }, 500);
+    }, 100);
+  };
 
   useEffect(() => {
     setIsVisible(true);
@@ -22,19 +47,27 @@ export default function Hero() {
     return () => clearInterval(interval);
   }, []);
 
-  const features = [
-    { icon: <Scan className="w-8 h-8" />, text: t("hero.features.scan") },
-    { icon: <Recycle className="w-8 h-8" />, text: t("hero.features.sort") },
-    { icon: <Cpu className="w-8 h-8" />, text: t("hero.features.integration") }
-  ];
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-violet-900 relative overflow-hidden transition-all duration-1000">
-      <div className="absolute inset-0">
-        <div className="absolute top-20 left-20 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-20 w-96 h-96 bg-violet-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-pink-500/10 rounded-full blur-3xl animate-pulse delay-500"></div>
+      <div className={`absolute inset-0 transition-opacity duration-1000 ${isDarkTheme ? 'opacity-100' : 'opacity-0'}`}>
+        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-violet-900 relative overflow-hidden">
+          <div className="absolute inset-0">
+            <div className="absolute top-20 left-20 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl animate-pulse"></div>
+            <div className="absolute bottom-20 right-20 w-96 h-96 bg-violet-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-pink-500/10 rounded-full blur-3xl animate-pulse delay-500"></div>
+          </div>
+        </div>
       </div>
+      <div className={`absolute inset-0 transition-opacity duration-1000 ${isDarkTheme ? 'opacity-0' : 'opacity-100'}`}>
+        <div className="min-h-screen bg-gradient-to-br from-stone-200 via-gray-300 to-stone-400 relative overflow-hidden">
+          <div className="absolute inset-0">
+            <div className="absolute top-20 left-20 w-72 h-72 bg-amber-400/10 rounded-full blur-3xl animate-pulse"></div>
+            <div className="absolute bottom-20 right-20 w-96 h-96 bg-stone-400/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-gray-400/10 rounded-full blur-3xl animate-pulse delay-500"></div>
+          </div>
+        </div>
+      </div>
+      <div className={`absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent transform transition-all duration-1000 ${isTransitioning ? 'translate-x-0 opacity-100' : '-translate-x-full opacity-0'}`}></div>
 
       <header className="relative z-10 pt-4 px-6">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
@@ -64,18 +97,17 @@ export default function Hero() {
           </div>
 
           <h1 className={`text-5xl md:text-6xl xl:text-7xl font-bold text-white my-10 transition-all duration-1000 delay-200 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-            <span className="bg-gradient-to-r from-red-500 via-pink-500 to-purple-500 bg-clip-text text-transparent">Smart</span>
-            <span className="text-white"> Sorting</span>
+            <span className="bg-gradient-to-r from-red-500 via-pink-500 to-purple-500 bg-clip-text text-transparent">Derm</span>
+            <span className="text-white">Fridge</span>
           </h1>
           
           <p className={`text-md md:text-2xl text-white/80 mb-12 max-w-4xl mx-auto leading-relaxed transition-all duration-1000 delay-400 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             {t("hero.description")}
           </p>
  
-          {/* components a utiliser ? */}
           <div className={`transition-all duration-1000 delay-800 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
             <button 
-              onClick={() => navigate("/auth")}
+              onClick={handleAuth}
               className="group inline-flex items-center px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold rounded-full text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <span>{t("hero.cta")}</span>
@@ -118,4 +150,4 @@ export default function Hero() {
       </div>
     </div>
   );
-};
+}

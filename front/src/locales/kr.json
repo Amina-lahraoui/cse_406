@@ -37,5 +37,40 @@
             "form": "오류가 발생했습니다. 다시 시도해주세요",
             "connectionError": "연결 오류가 발생했습니다. 인터넷 연결을 확인해주세요"
         }
+    },
+    "home": {
+        "welcome": "환영합니다",
+        "subtitle": "상호 작용 모드를 선택하세요",
+        "faceScan.title": "얼굴 스캔",
+        "faceScan.description": "실시간 또는 사진으로 피부 상태 분석",
+        "inventory.title": "재고",
+        "inventory.description": "냉장고 내용물 보기 및 관리",
+        "getStarted": "시작하기",
+        "quickStats": "빠른 통계",
+        "stats.scans": "스캔",
+        "stats.items": "항목",
+        "stats.recommendations": "추천",
+        "stats.alerts": "알림"
+    }, 
+    "settings": {
+        "title": "설정",
+        "back": "뒤로",
+        "save": "설정 저장",
+        "dietary.title": "식이 선호도",
+        "dietary.description": "식이 제한 및 선호도 설정",
+        "dietary.none": "없음",
+        "dietary.vegetarian": "채식주의자",
+        "dietary.vegan": "비건",
+        "dietary.glutenFree": "글루텐 프리",
+        "notifications.title": "알림 빈도",
+        "notifications.description": "업데이트 수신 빈도 선택",
+        "notifications.realtime": "실시간",
+        "notifications.daily": "매일",
+        "notifications.weekly": "주간",
+        "notifications.off": "끄기",
+        "language.title": "언어",
+        "language.description": "선호하는 언어 선택",
+        "privacy.title": "개인정보 보호 모드",
+        "privacy.description": "향상된 개인 정보 보호 및 데이터 보호"
     }
 }

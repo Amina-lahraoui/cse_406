@@ -27,8 +27,8 @@
         "skipAuth": "Skip",
         "errors": {
             "emailRequired": "Email is required",
-            "emailInvalid": "Please enter a valid email address",
             "passwordRequired": "Password is required",
+            "emailInvalid": "Please enter a valid email address",
             "passwordTooShort": "Password must be at least 8 characters long",
             "passwordWeak": "Password must include at least one uppercase letter, one lowercase letter, one number, and one special character",
             "limitRequest" : "Too many attempts, try again after 5 minutes",
@@ -36,5 +36,40 @@
             "form": "An error occurred. Please try again",
             "connectionError": "Connection error. Please check your internet connection"
         }
+    },
+    "home": {
+        "welcome": "Welcome",
+        "subtitle": "Choose your interaction mode",
+        "faceScan.title": "Face Scan",
+        "faceScan.description": "Analyze your skin condition in real-time or from photos",
+        "inventory.title": "Inventory",
+        "inventory.description": "View and manage your fridge contents",
+        "getStarted": "Get Started",
+        "quickStats": "Quick Stats",
+        "stats.scans": "Scans",
+        "stats.items": "Items",
+        "stats.recommendations": "Recommendations",
+        "stats.alerts": "Alerts"
+    },
+    "settings": {
+        "title": "Settings",
+        "back": "Back",
+        "save": "Save Settings",
+        "dietary.title": "Dietary Preferences",
+        "dietary.description": "Set your dietary restrictions and preferences",
+        "dietary.none": "None",
+        "dietary.vegetarian": "Vegetarian",
+        "dietary.vegan": "Vegan",
+        "dietary.glutenFree": "Gluten-Free",
+        "notifications.title": "Notification Frequency",
+        "notifications.description": "Choose how often you receive updates",
+        "notifications.realtime": "Real-time",
+        "notifications.daily": "Daily",
+        "notifications.weekly": "Weekly",
+        "notifications.off": "Off",
+        "language.title": "Language",
+        "language.description": "Select your preferred language",
+        "privacy.title": "Privacy Mode",
+        "privacy.description": "Enhanced privacy and data protection"
     }
 }
