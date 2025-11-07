@@ -4,7 +4,7 @@
     },
     "hero": {
         "course": "Software Engineering",
-        "description": "Innovative smart solution for LG products, enabling automatic and intelligent waste sorting with a simple scan",
+        "description": "Something smart solution for LG products, enabling automatic and intelligent waste sorting with a simple scan",
         "features": {
             "scan": "Automatic Scan",
             "sort": "Smart Sorting",

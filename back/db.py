@@ -3,6 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import os
 
+# docker exec -it cse_406-db-1 psql -U user -d mydb
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
     "postgresql://user:password@db:5432/mydb"
