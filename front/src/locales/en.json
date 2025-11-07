@@ -4,33 +4,49 @@
     },
     "hero": {
         "course": "Software Engineering",
-        "description": "Something smart solution for LG products, enabling automatic and intelligent waste sorting with a simple scan",
+        "description": "AI-powered personal assistant that connects nutrition and skincare by analyzing your facial features and fridge content to recommend personalized, skin-friendly meals.",
         "features": {
-            "scan": "Automatic Scan",
-            "sort": "Smart Sorting",
-            "integration": "IoT Integration"
+            "skin": "Skin Analysis",
+            "food": "Fridge Scan",
+            "recommend": "Recommendations"
         },
-        "cta": "Start",
-        "common": {
-            "loading" : "Loading ..."
-        }
+        "cta": "Start"
+    },
+    "common": {
+        "loading" : "Loading ..."
+    },
+    "notfound": {
+        "message": "Oops! The page you’re looking for doesn’t exist or has been moved.",
+        "button": "Back to home",
+        "contactText": "You can also",
+        "contactLink": "contact us",
+        "contactEnd": "if the problem persists."
     },
     "auth": {
         "login": "Login",
+        "name": "Name",
         "email": "Email",
         "password": "Password",
+        "confirmPassword": "Password confirmation",
         "submit": "Sign In",
         "noAccount": "Don't have an account?",
+        "haveAccount": "I have an account",
         "signin": "Sign up",
         "forgot": "Forgot your password?",
         "reset": "Reset it",
         "skipAuth": "Skip",
+        "submitForgot": "Send reset link",
+        "tryAnotherEmail": "Try another email",
+        "successMessage": "A password reset link has been sent to {{email}}. Please check your inbox.",
         "errors": {
+            "nameRequired": "Name is required",
             "emailRequired": "Email is required",
             "passwordRequired": "Password is required",
+            "confirmPasswordRequired": "Password confirmation is required",
             "emailInvalid": "Please enter a valid email address",
             "passwordTooShort": "Password must be at least 8 characters long",
             "passwordWeak": "Password must include at least one uppercase letter, one lowercase letter, one number, and one special character",
+            "passwordMismatch": "Passwords do not match",
             "limitRequest" : "Too many attempts, try again after 5 minutes",
             "authFailed": "Invalid email or password",
             "form": "An error occurred. Please try again",
@@ -38,14 +54,11 @@
         }
     },
     "home": {
-        "welcome": "Welcome",
-        "subtitle": "Choose your interaction mode",
         "faceScan.title": "Face Scan",
-        "faceScan.description": "Analyze your skin condition in real-time or from photos",
+        "faceScan.description": "Analyze your skin condition from photos",
         "inventory.title": "Inventory",
         "inventory.description": "View and manage your fridge contents",
         "getStarted": "Get Started",
-        "quickStats": "Quick Stats",
         "stats.scans": "Scans",
         "stats.items": "Items",
         "stats.recommendations": "Recommendations",

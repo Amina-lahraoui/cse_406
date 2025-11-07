@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/context/AuthContext";
@@ -14,11 +14,17 @@ export default function SignupPage() {
         i18n.changeLanguage(newLang);
     };
 
-    const { signup } = useAuth();
+    const { signup, user, loading } = useAuth();
     const [formData, setFormData] = useState({name: "",email: "",password: "",confirmPassword: ""});
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     
+    useEffect(() => {
+        if (!loading && user) {
+            navigate("/home");
+        }
+    }, [user, loading, navigate]);
+
     const { notification, showNotification, closeNotification } = useNotification();
     
     const validate = () => {
@@ -68,10 +74,7 @@ export default function SignupPage() {
                 const result = await signup(formData.email, formData.password, formData.name);
 
                 if (result.success) {
-                    if (result.data?.language) {
-                        i18n.changeLanguage(result.data.language);
-                    }
-                    showNotification(t("auth.signupSuccess"), "success"); // Add
+                    if (result.data?.language) i18n.changeLanguage(result.data.language);
                     setTimeout(() => {
                         navigate("/home");
                     }, 1000);
@@ -97,6 +100,14 @@ export default function SignupPage() {
         setFormData((prev) => ({ ...prev, [name]: value }));
         if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
     };
+    
+    if (loading) {
+        return (
+            <div className="relative w-full h-screen flex items-center justify-center">
+                <div className="text-gray-600">{t("common.loading")}</div>
+            </div>
+        );
+    }
 
     return (
         <div className="relative w-full h-screen overflow-hidden">
@@ -128,7 +139,7 @@ export default function SignupPage() {
                             <span className="text-sm">{t("header.location")}</span>
                         </div>
                     </div>
-                    <div className="flex items-center px-3 py-2 rounded-full p-1 cursor-pointer transition-all duration-300 text-gray-700 hover:bg-black/5">
+                    <div className="flex items-center px-3 py-2 rounded-full p-1 cursor-pointer transition-all duration-300 text-gray-700 hover:bg-[#A50034]/5">
                         <Languages onClick={toggleLanguage} className="w-6 h-6" />
                     </div>
                 </div>
@@ -139,7 +150,7 @@ export default function SignupPage() {
                     <form className="space-y-4" onSubmit={submit} noValidate>
                         <div>
                             <Input
-                                label={t("auth.name")} // Add
+                                label={t("auth.name")}
                                 name="name"
                                 id="name"
                                 type="text"
@@ -175,7 +186,7 @@ export default function SignupPage() {
                         </div>
                         <div>
                             <Input
-                                label={t("auth.confirmPassword")} // Add
+                                label={t("auth.confirmPassword")}
                                 name="confirmPassword"
                                 id="confirmPassword"
                                 type="password"
@@ -193,16 +204,14 @@ export default function SignupPage() {
                             disabled={isSubmitting}
                             loading={isSubmitting}
                         >
-                            {t("auth.signupSubmit")} 
-                            {/* Add */}
+                            {t("auth.signin")} 
                         </Button>
                     </form>
 
                     <div className="space-y-2">
                         <p className="text-center text-sm">
                             {t("auth.haveAccount")}{" "}
-                            {/* Add */}
-                            <a onClick={() => navigate("../auth")} className="text-emerald-500 hover:underline font-medium cursor-pointer">
+                            <a onClick={() => navigate("../auth")} className="text-[#A50034] hover:underline font-medium cursor-pointer">
                                 {t("auth.login")}
                             </a>
                         </p>

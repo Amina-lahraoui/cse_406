@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
@@ -16,11 +16,15 @@ export default function Auth() {
         i18n.changeLanguage(newLang);
     };
     
-    const { login } = useAuth();
+    const { login, user, loading } = useAuth();
     const [auth, setAuth] = useState({ email: '', password: '' });
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     
+    useEffect(() => {
+        if (!loading && user) navigate("/home");
+    }, [user, loading, navigate]);
+
     const { notification, showNotification, closeNotification } = useNotification();
     
     const validate = () => {
@@ -71,6 +75,14 @@ export default function Auth() {
         if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
     };
 
+    if (loading) {
+        return (
+            <div className="relative w-full h-screen flex items-center justify-center">
+                <div className="text-gray-600">{t("common.loading")}</div>
+            </div>
+        );
+    }
+
     return (
         <div className="relative w-full h-screen overflow-hidden">
             <div className="absolute inset-0 transition-opacity duration-1000 opacity-0">
@@ -101,7 +113,7 @@ export default function Auth() {
                             <span className="text-sm">{t("header.location")}</span>
                         </div>
                     </div>
-                    <div className="flex items-center px-3 py-2 rounded-full p-1 cursor-pointer transition-all duration-300 text-gray-700 hover:bg-black/5">
+                    <div className="flex items-center px-3 py-2 rounded-full p-1 cursor-pointer transition-all duration-300 text-gray-700 hover:bg-[#A50034]/5">
                         <Languages onClick={toggleLanguage} className="w-6 h-6" />
                     </div>
                 </div>
@@ -152,7 +164,6 @@ export default function Auth() {
                             fullWidth
                             onClick={() => navigate("./home")}
                             disabled={isSubmitting}
-                            loading={isSubmitting}
                         >
                             {t("auth.skipAuth")}
                         </Button>
@@ -161,10 +172,10 @@ export default function Auth() {
 
                     <div className="space-y-2">
                         <p className="text-center text-sm">
-                            {t("auth.noAccount")} <a onClick={() => navigate("../sign")} className="text-emerald-500 hover:underline font-medium cursor-pointer">{t("auth.signin")}</a>
+                            {t("auth.noAccount")} <a onClick={() => navigate("../sign")} className="text-[#A50034] hover:underline font-medium cursor-pointer">{t("auth.signin")}</a>
                         </p>
                         <p className="text-center text-sm">
-                            {t("auth.forgot")} <a onClick={() => navigate("../forgot")} className="text-emerald-500 hover:underline font-medium cursor-pointer">{t("auth.reset")}</a>
+                            {t("auth.forgot")} <a onClick={() => navigate("../forgot")} className="text-[#A50034] hover:underline font-medium cursor-pointer">{t("auth.reset")}</a>
                         </p>
                     </div>
                 </div>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { ChevronRight, Scan, Recycle, Cpu, Users, MapPin, Languages } from 'lucide-react';
+import { ChevronRight, Camera, Utensils, Sparkles, Users, MapPin, Languages } from 'lucide-react';
 
 export default function Hero() {
   const navigate = useNavigate();
@@ -17,9 +17,9 @@ export default function Hero() {
 
   const [currentFeature, setCurrentFeature] = useState(0);
   const features = [
-    { icon: <Scan className="w-8 h-8" />, text: t("hero.features.scan") },
-    { icon: <Recycle className="w-8 h-8" />, text: t("hero.features.sort") },
-    { icon: <Cpu className="w-8 h-8" />, text: t("hero.features.integration") }
+    { icon: <Camera className="w-8 h-8" />, text: t("hero.features.skin") },
+    { icon: <Utensils className="w-8 h-8" />, text: t("hero.features.food") },
+    { icon: <Sparkles className="w-8 h-8" />, text: t("hero.features.recommend") }
   ];
 
   const handleAuth = () => {

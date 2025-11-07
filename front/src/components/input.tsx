@@ -45,9 +45,9 @@ export default function Input({
     disabled = false
 }: InputProps) {
     const isTextarea = type === 'textarea';
-    const baseClasses = `mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-emerald-500 bg-white text-black dark:bg-gray-700 dark:text-white placeholder:text-sm 
-    ${error && "border-red-500 dark:border-red-900"}
-    ${disabled && "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 cursor-not-allowed opacity-60"}`;
+    const baseClasses = `mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-[#A50034] bg-white text-black placeholder:text-sm 
+    ${error && "border-[#7A003C]"}
+    ${disabled && "bg-gray-100 dark:bg-gray-800 text-gray-500 cursor-not-allowed opacity-60"}`;
 
     return (
         <div className={`mb-4 ${className || ''}`}>

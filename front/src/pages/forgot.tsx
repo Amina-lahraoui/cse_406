@@ -1,25 +1,31 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { Error } from "@/components";
-import { Input } from "@/components";
-import { Button } from "@/components";
+import { useAuth } from "@/context/AuthContext";
+import { Input, Button, Notification } from "@/components";
 import { MapPin, Languages, Check } from 'lucide-react';
 
 export default function Forgot() {
+    const navigate = useNavigate();
     const { t, i18n } = useTranslation();
     const toggleLanguage = () => {
         const newLang = i18n.language === "en" ? "kr" : "en";
         i18n.changeLanguage(newLang);
     };
 
-    const navigate = useNavigate();
+    const { user, loading } = useAuth();
     const [email, setEmail] = useState("");
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitted, setSubmitted] = useState(false);
+
+    useEffect(() => {
+        if (!loading && user) {
+            navigate("/home");
+        }
+    }, [user, loading, navigate]);
 
     const change = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setEmail(e.target.value);
@@ -29,9 +35,9 @@ export default function Forgot() {
         let erreurs: Record<string, string> = {};
 
         if (!email.trim()) {
-            erreurs.email = t("errors.emailRequired");
+            erreurs.email = t("auth.errors.emailRequired");
         } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            erreurs.email = t("errors.emailInvalid");
+            erreurs.email = t("auth.errors.emailInvalid");
         }
 
         setErrors(erreurs);
@@ -46,12 +52,20 @@ export default function Forgot() {
             try {
                 setSubmitted(true);
             } catch (error) {
-                setErrors({ form: t("errors.sendError") });
+                setErrors({ form: t("auth.errors.?") });
             }
         }
 
         setIsSubmitting(false);
     };
+
+    if (loading) {
+        return (
+            <div className="relative w-full h-screen flex items-center justify-center">
+                <div className="text-gray-600">{t("common.loading")}</div>
+            </div>
+        );
+    }
 
     return (
         <div className="relative w-full h-screen overflow-hidden">
@@ -74,7 +88,7 @@ export default function Forgot() {
                     </div>
                 </div>
             </div>
-            
+
             <header className="relative z-20 pt-4 px-6">
                 <div className="max-w-7xl mx-auto flex justify-between items-center">
                     <div className="flex items-center space-x-4">
@@ -83,49 +97,68 @@ export default function Forgot() {
                             <span className="text-sm">{t("header.location")}</span>
                         </div>
                     </div>
-                    <div className="flex items-center px-3 py-2 rounded-full p-1 cursor-pointer transition-all duration-300 text-gray-700 hover:bg-black/5">
+                    <div className="flex items-center px-3 py-2 rounded-full p-1 cursor-pointer transition-all duration-300 text-gray-700 hover:bg-[#A50034]/5">
                         <Languages onClick={toggleLanguage} className="w-6 h-6" />
                     </div>
                 </div>
             </header>
 
 
-            <div className="relative z-10 flex items-center justify-center px-6" style={{ height: 'calc(100vh - 80px)' }}>
-            <div className="w-full max-w-md p-8 space-y-6 rounded-2xl shadow-2xl backdrop-blur-sm bg-white/90 dark:bg-gray-800/90 text-gray-900 dark:text-white">
-                {errors.form && <Error message={errors.form} />}
-                {!submitted ? (
-                    <>
-                        <form className="space-y-4" onSubmit={submit}>
-                            <div>
-                                <Input label={t("email")} name="email" id="email" type="email" value={email ?? ""} onChange={change} error={errors.email} />
+            <div className="relative z-10 flex items-center justify-center px-6 h-[calc(100vh-80px)]">
+                <div className="w-full max-w-md p-8 space-y-6 rounded-2xl shadow-2xl backdrop-blur-sm bg-white/90 dark:bg-gray-800/90 text-gray-900 dark:text-white">
+                    {!submitted ? (
+                        <>
+                            <form className="space-y-4" onSubmit={submit} noValidate>
+                                <div>
+                                    <Input
+                                        label={t("auth.email")}
+                                        name="email"
+                                        id="email"
+                                        type="email"
+                                        value={email ?? ""}
+                                        onChange={change}
+                                        error={errors.email}
+                                        required
+                                    />
+                                </div>
+                                <Button
+                                    type="submit"
+                                    variant="primary"
+                                    size="sm"
+                                    fullWidth
+                                    disabled={isSubmitting}
+                                    loading={isSubmitting}
+                                >
+                                    {t("auth.submitForgot")}
+                                </Button>
+                            </form>
+                            <div className="space-y-2">
+                                <p className="text-center text-sm">
+                                    {t("auth.noAccount")} <a onClick={() => navigate("../auth")} className="text-[#A50034] hover:underline font-medium cursor-pointer">{t("auth.signin")}</a>
+                                </p>
+                                <p className="text-center text-sm">
+                                    <a onClick={() => navigate("../sign")} className="text-[#A50034] hover:underline font-medium cursor-pointer">{t("auth.submit")}</a>
+                                </p>
                             </div>
-                            <Button type="submit" variant="primary" size="sm" fullWidth disabled={isSubmitting} loading={isSubmitting} className="ml-auto">{isSubmitting ? t("submitting") : t("submit")}</Button>
-                        </form>
-                        <p className="text-center text-sm m-0">
-                            {t("noAccount")}<a href="./sign" className="text-emerald-500 hover:underline">{t("signin")}</a>
-                        </p>
-                        <p className="text-center text-sm mt-1">
-                            <a href="../auth" className="text-emerald-500 hover:underline">{t("backToLogin")}</a>
-                        </p>
-                    </>
-                ) : (
-                    <div className="space-y-4">
-                        <div className="flex justify-center">
-                            <div className="bg-green-100 dark:bg-green-900 p-3 rounded-full">
-                                <Check className="h-6 w-6 text-green-600 dark:text-green-300" />
+                        </>
+                    ) : (
+                        <div className="space-y-4">
+                            <div className="flex justify-center">
+                                <div className="bg-green-100 dark:bg-green-900 p-3 rounded-full">
+                                    <Check className="h-6 w-6 text-green-600 dark:text-green-300" />
+                                </div>
                             </div>
+                            <p className="block text-sm text-center font-semibold text-gray-700 dark:text-white">
+                                {t("auth.successMessage", { email })}
+                            </p>
+                            <Button onClick={() => setSubmitted(false)} variant="primary" size="sm" fullWidth className="ml-auto">{t("auth.tryAnotherEmail")}</Button>
+                            <p className="text-center text-sm">
+                                <a onClick={() => navigate("../auth")} className="text-[#A50034] hover:underline font-medium cursor-pointer">{t("auth.submit")}</a>
+                            </p>
                         </div>
-                        <p className="block text-sm text-center font-semibold text-gray-700 dark:text-white">
-                            {t("successMessage", { email })}
-                        </p>
-                        <Button onClick={() => setSubmitted(false)} variant="primary" size="sm" fullWidth className="ml-auto">{t("tryAnotherEmail")}</Button>
-                        <p className="text-center text-sm">
-                            <a href="../auth" className="text-emerald-500 hover:underline">{t("backToLogin")}</a>
-                        </p>
-                    </div>
-                )}
+                    )}
+                </div>
             </div>
-        </div>
         </div>
     );
 }

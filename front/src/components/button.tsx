@@ -4,7 +4,7 @@ import { ArrowRight } from 'lucide-react';
 
 interface ButtonProps {
     children: React.ReactNode;
-    variant?: 'primary' | 'secondary' | 'outline' | 'danger';
+    variant?: 'primary' | 'secondary';
     size?: 'sm' | 'md' | 'lg';
     href?: string;
     onClick?: () => void;
@@ -37,10 +37,8 @@ export default function Button({
   `.trim();
 
     const variants = {
-        primary: 'bg-emerald-600 text-white shadow-lg hover:bg-emerald-700 focus:ring-emerald-500',
-        secondary: 'bg-white text-gray-700 border border-gray-300 shadow-sm hover:bg-gray-50 focus:ring-emerald-500',
-        outline: 'border border-emerald-200 dark:border-emerald-800 text-gray-900 dark:text-white hover:bg-emerald-50 dark:hover:bg-emerald-900/30 focus:ring-emerald-500',
-        danger: 'bg-red-600 text-white shadow-lg hover:bg-red-700 focus:ring-red-500'
+        primary: 'bg-[#A50034] text-white shadow-lg hover:bg-[#8E002C] focus:ring-[#E61A5F]',
+        secondary: 'bg-white text-gray-700 border border-gray-300 shadow-sm hover:bg-gray-50 focus:ring-emerald-500'
     };
 
     const sizes = { sm: 'px-3 py-2 text-sm', md: 'px-5 py-3 text-base font-semibold', lg: 'px-6 py-4 text-lg font-semibold' };
