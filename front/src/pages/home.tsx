@@ -51,27 +51,7 @@ export default function Home() {
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                 {!showSettings ? (
                     <>
-                        <div className="bg-white rounded-2xl shadow-lg mb-8 p-6">
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                <div className="text-center p-4 bg-emerald-50 rounded-xl">
-                                    <p className="text-3xl font-bold text-emerald-600">0</p>
-                                    <p className="text-sm text-gray-600 mt-1">{t("home.stats.scans")}</p>
-                                </div>
-                                <div className="text-center p-4 bg-emerald-50 rounded-xl">
-                                    <p className="text-3xl font-bold text-emerald-600">0</p>
-                                    <p className="text-sm text-gray-600 mt-1">{t("home.stats.items")}</p>
-                                </div>
-                                <div className="text-center p-4 bg-emerald-50 rounded-xl">
-                                    <p className="text-3xl font-bold text-emerald-600">0</p>
-                                    <p className="text-sm text-gray-600 mt-1">{t("home.stats.recommendations")}</p>
-                                </div>
-                                <div className="text-center p-4 bg-emerald-50 rounded-xl">
-                                    <p className="text-3xl font-bold text-emerald-600">0</p>
-                                    <p className="text-sm text-gray-600 mt-1">{t("home.stats.alerts")}</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                             <div
                                 key="face-scan"
                                 onClick={() => navigate("/capture")}
@@ -108,7 +88,26 @@ export default function Home() {
                                     </div>
                                 </div>
                             </div>
-                        
+                        </div>
+                        <div className="bg-white rounded-2xl shadow-lg p-6">
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <div className="text-center p-4 bg-emerald-50 rounded-xl">
+                                    <p className="text-3xl font-bold text-emerald-600">0</p>
+                                    <p className="text-sm text-gray-600 mt-1">{t("home.stats.scans")}</p>
+                                </div>
+                                <div className="text-center p-4 bg-emerald-50 rounded-xl">
+                                    <p className="text-3xl font-bold text-emerald-600">0</p>
+                                    <p className="text-sm text-gray-600 mt-1">{t("home.stats.items")}</p>
+                                </div>
+                                <div className="text-center p-4 bg-emerald-50 rounded-xl">
+                                    <p className="text-3xl font-bold text-emerald-600">0</p>
+                                    <p className="text-sm text-gray-600 mt-1">{t("home.stats.recommendations")}</p>
+                                </div>
+                                <div className="text-center p-4 bg-emerald-50 rounded-xl">
+                                    <p className="text-3xl font-bold text-emerald-600">0</p>
+                                    <p className="text-sm text-gray-600 mt-1">{t("home.stats.alerts")}</p>
+                                </div>
+                            </div>
                         </div>
                     </>
                 ) : (

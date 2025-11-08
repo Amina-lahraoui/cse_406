@@ -84,5 +84,26 @@
         "language.description": "Select your preferred language",
         "privacy.title": "Privacy Mode",
         "privacy.description": "Enhanced privacy and data protection"
+    },
+    "camera": {
+        "selectCamera": "Select Camera",
+        "defaultCamera": "(Default Camera)",
+        "camera": "Camera",
+        "start": "Start",
+        "stop": "Stop",
+        "toggle": "Toggle",
+        "capture": "Capture Photo",
+        "import": "Import Image",
+        "importImage": "Import image",
+        "preview": "Preview",
+        "previewAlt": "Captured photo preview",
+        "download": "Download",
+        "delete": "Delete",
+        "noCaptured": "No photo captured",
+        "enableSound": "Enable sound",
+        "disableSound": "Disable sound",
+        "videoNotSupported": "Video capture is not supported by this browser.",
+        "chooseImageFile": "Please choose an image file.",
+        "unableLoadImage": "Unable to load image."
     }
 }

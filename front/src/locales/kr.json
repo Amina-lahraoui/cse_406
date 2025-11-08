@@ -84,5 +84,26 @@
         "language.description": "선호하는 언어 선택",
         "privacy.title": "개인정보 보호 모드",
         "privacy.description": "향상된 개인 정보 보호 및 데이터 보호"
+    },
+    "camera": {
+        "selectCamera": "카메라 선택",
+        "defaultCamera": "(기본 카메라)",
+        "camera": "카메라",
+        "start": "시작",
+        "stop": "중지",
+        "toggle": "전환",
+        "capture": "사진 촬영",
+        "import": "이미지 가져오기",
+        "importImage": "이미지 가져오기",
+        "preview": "미리보기",
+        "previewAlt": "촬영된 사진 미리보기",
+        "download": "다운로드",
+        "delete": "삭제",
+        "noCaptured": "촬영된 사진 없음",
+        "enableSound": "소리 활성화",
+        "disableSound": "소리 비활성화",
+        "videoNotSupported": "이 브라우저에서는 비디오 캡처를 지원하지 않습니다.",
+        "chooseImageFile": "이미지 파일을 선택하세요.",
+        "unableLoadImage": "이미지를 로드할 수 없습니다."
     }
 }
