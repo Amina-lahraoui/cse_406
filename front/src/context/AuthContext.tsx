@@ -59,31 +59,50 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     checkAuth();
   }, []);
 
-  const login = async (email: string, password: string): Promise<AuthResponse> => {
+ const login = async (email: string, password: string): Promise<AuthResponse> => {
+  try {
+    const response = await fetch(`${apiUrl}/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ email, password }),
+    });
+
+    let data: any = null;
+
+    // Safely parse JSON
     try {
-      const response = await fetch(`${apiUrl}/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        return {
-          success: false,
-          status: response.status,
-          error: data.detail || "Authentication failed",
-        };
-      }
-
-      setUser(data);
-      return { success: true, data };
-    } catch (error) {
-      return { success: false, error: "Connection error" };
+      data = await response.json();
+    } catch (e) {
+      return { success: false, status: response.status, error: "Invalid server response" };
     }
-  };
+
+    // Handle backend validation errors (422)
+    if (response.status === 422) {
+      const message = data?.detail?.[0]?.msg || "Invalid input";
+      return { success: false, status: 422, error: message };
+    }
+
+    // Wrong password / email
+    if (!response.ok) {
+      return {
+        success: false,
+        status: response.status,
+        error: data.detail || "Authentication failed",
+      };
+    }
+
+    // Backend sends: { access_token, token_type, user: {...} }
+    const cleanUser = data.user;
+    setUser(cleanUser);
+
+    return { success: true, data: cleanUser };
+
+  } catch (error) {
+    return { success: false, error: "Connection error" };
+  }
+};
+
 
   const signup = async (email: string, password: string, name?: string): Promise<AuthResponse> => {
     try {
