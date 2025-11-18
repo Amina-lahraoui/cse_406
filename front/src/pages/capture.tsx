@@ -4,8 +4,9 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/context/AuthContext";
-import { Error, Button } from "@/components";
-import { Camera, Download, Trash2, RotateCw, Volume2, VolumeX, Languages, LogOut } from "lucide-react";
+import { useNotification } from "@/hooks";
+import { Error, Button, Notification } from "@/components";
+import { Camera, Download, RotateCw, Languages, LogOut, X, Upload } from "lucide-react";
 
 interface DeviceInfo extends MediaDeviceInfo {
   deviceId: string;
@@ -14,8 +15,9 @@ interface DeviceInfo extends MediaDeviceInfo {
 }
 type PermissionState = "unknown" | "granted" | "denied";
 type FacingMode = "user" | "environment";
+type Mode = "select" | "capture" | "import" | "preview";
 
-export default function CameraCapture(): JSX.Element {
+export default function CameraCapture() {
     const navigate = useNavigate();
     const { t, i18n } = useTranslation();
     const toggleLanguage = () => {
@@ -28,24 +30,31 @@ export default function CameraCapture(): JSX.Element {
         logout();
         navigate("/");
     };
+  
+  const { notification, showNotification, closeNotification } = useNotification();
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [mode, setMode] = useState<Mode>("select");
+  const [previousMode, setPreviousMode] = useState<Mode | null>(null);
   const [permissionState, setPermissionState] = useState<PermissionState>("unknown");
   const [facingMode, setFacingMode] = useState<FacingMode>("user");
   const [capturedDataUrl, setCapturedDataUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [devices, setDevices] = useState<DeviceInfo[]>([]);
   const [selectedDeviceId, setSelectedDeviceId] = useState<string | null>(null);
-  const [isMuted, setIsMuted] = useState<boolean>(true);
+  const [isUploading, setIsUploading] = useState<boolean>(false);
+  // // const [uploadStatus, setUploadStatus] = useState<"idle" | "success" | "error">("idle");
 
   const startCamera = async (deviceId: string | null = null): Promise<void> => {
     stopCamera();
     setError(null);
 
+    if (mode !== "capture") return;
+    
     try {
       const constraints: MediaStreamConstraints = deviceId
         ? { video: { deviceId: { exact: deviceId } } }
@@ -60,9 +69,7 @@ export default function CameraCapture(): JSX.Element {
       }
       setPermissionState("granted");
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : String(err);
-      console.error("startCamera error", err);
-      setError(errorMessage);
+      setError(t("camera.errors.startCamera"));  // Erreur de démarage de la camera 
       setPermissionState("denied");
     }
   };
@@ -78,56 +85,46 @@ export default function CameraCapture(): JSX.Element {
         videoRef.current.srcObject = null;
       }
     } catch (err) {
-      console.error("stopCamera error", err);
+      setError(t("camera.errors.stopCamera")); // Erreur lors de l'arret de la camera 
     }
   };
 
-  const capturePhoto = (): void => {
-    setError(null);
-    if (!videoRef.current) return;
+const capturePhoto = (): void => {
+  if (!videoRef.current) return;
+  const canvas = canvasRef.current || document.createElement("canvas");
+  canvas.width = videoRef.current.videoWidth || 640;
+  canvas.height = videoRef.current.videoHeight || 480;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
 
-    const video = videoRef.current;
-    const canvas = canvasRef.current || document.createElement("canvas");
+  if (facingMode === "user") {
+    ctx.translate(canvas.width, 0);
+    ctx.scale(-1, 1);
+  }
+  ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
 
-    canvas.width = video.videoWidth || 640;
-    canvas.height = video.videoHeight || 480;
+  setCapturedDataUrl(canvas.toDataURL("image/jpeg", 0.9));
+  setPreviousMode("capture");
+  setMode("preview");
+};
 
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+const onFileChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  if (!file.type.startsWith("image/")) {
+    setError(t("camera.errors.noFile"));  // Veuillez choisir un fichier image
+    return;
+  }
 
-    if (facingMode === "user") {
-      ctx.translate(canvas.width, 0);
-      ctx.scale(-1, 1);
-    }
-
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-    if (facingMode === "user") {
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-    }
-
-    const dataUrl = canvas.toDataURL("image/jpeg", 0.9);
-    setCapturedDataUrl(dataUrl);
+  const reader = new FileReader();
+  reader.onload = () => {
+    setCapturedDataUrl(reader.result as string);
+    setPreviousMode("import");
+    setMode("preview");
   };
-
-  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    setError(null);
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (!file.type.startsWith("image/")) {
-      setError("Veuillez choisir un fichier image.");
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = reader.result as string;
-      setCapturedDataUrl(result);
-    };
-    reader.onerror = () => setError("Impossible de charger l'image.");
-    reader.readAsDataURL(file);
-  };
+  reader.readAsDataURL(file);
+};
 
   const enumerateVideoDevices = async (): Promise<void> => {
     try {
@@ -138,22 +135,67 @@ export default function CameraCapture(): JSX.Element {
         setSelectedDeviceId(vids[0].deviceId);
       }
     } catch (err) {
-      console.warn("enumerateDevices error", err);
+      setError(err)
+      console.warn("enumerateDevices error", err); // ???? remplacer par un setErrors ? 
+    }
+  };
+
+  const apiUrl = import.meta.env.VITE_API_URL;
+  const uploadPhoto = async (): Promise<void> => {
+    if (!capturedDataUrl || !previousMode) return;
+
+    setIsUploading(true);
+    // setUploadStatus("idle");
+    setError(null);
+      
+    try {
+      const res = await fetch(`${apiUrl}/photos/upload`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          image: capturedDataUrl,
+          source: previousMode === "capture" ? "capture" : "import",
+        }),
+        credentials: "include",
+      });
+
+      if (!res.ok) {
+        showNotification(t("camera.errors.uploadFail"), "error"); // Échec de l'upload
+      }
+
+      // setUploadStatus("success");
+      showNotification(t("camera.errors.uploadFail"), "error"); // Photo enregistrer 
+      
+      setTimeout(() => {
+        setCapturedDataUrl(null);
+        setMode("select");
+        setPreviousMode(null);
+        // setUploadStatus("idle");
+      }, 2000);
+    } catch (err) {
+      // setUploadStatus("error");
+      showNotification(t("camera.errors.uploadError"), "error"); // Error lors de l'upload
+    } finally {
+      setIsUploading(false);
     }
   };
 
   useEffect(() => {
-    if (selectedDeviceId) {
+    if (mode === "capture" && selectedDeviceId) {
       startCamera(selectedDeviceId);
+    } else if (mode !== "capture") {
+      stopCamera();
     }
-  }, [selectedDeviceId]);
+  }, [mode, selectedDeviceId]);
 
   useEffect(() => {
     let mounted = true;
 
     const initCamera = async (): Promise<void> => {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        setError("La capture vidéo n'est pas supportée par ce navigateur.");
+        setError(t("camera.errors.browser"));  // La capture vidéo n'est pas supportée par ce navigateur
         return;
       }
 
@@ -168,7 +210,7 @@ export default function CameraCapture(): JSX.Element {
             if (mounted) setPermissionState(res.state as PermissionState);
           });
         } catch (err) {
-          console.warn("Permission query not supported", err);
+          setError(t("camera.errors.browserPermission"));  // Erreur de permission au niveau de votre navigateur
         }
       }
     };
@@ -195,6 +237,31 @@ export default function CameraCapture(): JSX.Element {
     a.click();
   };
 
+  const handleBack = (): void => {
+    if (mode === "preview") {
+      if (previousMode) {
+        setMode(previousMode);
+        setPreviousMode(null);
+        setCapturedDataUrl(null);
+        // setUploadStatus("idle");
+        if (previousMode === "capture") startCamera(selectedDeviceId);
+        return;
+      }
+    }
+
+    setCapturedDataUrl(null);
+    setMode("select");
+    // setUploadStatus("idle");
+    stopCamera();
+  };
+
+  const handleModeSelect = (selectedMode: "capture" | "import"): void => {
+    setMode(selectedMode);
+    if (selectedMode === "capture") {
+      startCamera(selectedDeviceId);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-100 to-stone-200">
         <header className="bg-white/80 backdrop-blur-md shadow-sm relative z-10 pt-4">
@@ -217,40 +284,67 @@ export default function CameraCapture(): JSX.Element {
         </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Section Capture */}
-          <div className="lg:col-span-2">
+
+        {mode === "select" && (
+          <div className="flex flex-col items-center justify-center min-h-[500px] gap-6">
+            <h1 className="text-3xl font-bold text-gray-900 mb-8">{t("camera.chooseMode")}</h1>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full max-w-2xl">
+              <button
+                onClick={() => handleModeSelect("capture")}
+                className="group relative overflow-hidden rounded-2xl bg-white p-8 shadow-lg hover:shadow-xl transition-all hover:scale-105"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-[#A50034]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="relative flex flex-col items-center gap-4">
+                  <div className="p-4 rounded-full bg-[#A50034]/10 group-hover:bg-[#A50034]/20 transition-colors">
+                    <Camera className="w-8 h-8 text-[#A50034]" />
+                  </div>
+                  <div className="text-center">
+                    <h2 className="text-xl font-bold text-gray-900">{t("camera.capture")}</h2>
+                    <p className="text-sm text-gray-600 mt-1">{t("camera.captureDescription") || "Utilisez votre caméra"}</p>
+                  </div>
+                </div>
+              </button>
+              <button
+                onClick={() => handleModeSelect("import")}
+                className="group relative overflow-hidden rounded-2xl bg-white p-8 shadow-lg hover:shadow-xl transition-all hover:scale-105"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-[#A50034]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="relative flex flex-col items-center gap-4">
+                  <div className="p-4 rounded-full bg-[#A50034]/10 group-hover:bg-[#A50034]/20 transition-colors">
+                    <Upload className="w-8 h-8 text-[#A50034]" />
+                  </div>
+                  <div className="text-center">
+                    <h2 className="text-xl font-bold text-gray-900">{t("camera.import")}</h2>
+                    <p className="text-sm text-gray-600 mt-1">{t("camera.importDescription") || "Importer une image"}</p>
+                  </div>
+                </div>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {mode === "capture" && (
+          <div className="max-w-2xl mx-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">{t("camera.capturePhoto")}</h2>
+              <button
+                onClick={handleBack}
+                className="p-2 hover:bg-gray-200 rounded-full transition-colors"
+                aria-label="Close"
+              >
+                <X className="w-6 h-6 text-gray-700" />
+              </button>
+            </div>
             <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-              {/* Video Section */}
               <div className="relative bg-black rounded-t-2xl overflow-hidden">
                 <video
                   ref={videoRef}
                   className="w-full h-[500px] object-cover"
                   playsInline
-                  muted={isMuted}
                 />
-
-                {error && (
-                  <Error message={error} />
-                )}
-
-                {/* Mute Button */}
-                <button
-                  onClick={() => setIsMuted(!isMuted)}
-                  className="absolute top-4 right-4 p-2 bg-white/20 backdrop-blur-sm hover:bg-white/30 rounded-full transition-all border border-white/30"
-                  aria-label={isMuted ? t("camera.enableSound") : t("camera.disableSound")}
-                >
-                  {isMuted ? (
-                    <VolumeX className="w-5 h-5 text-white" />
-                  ) : (
-                    <Volume2 className="w-5 h-5 text-white" />
-                  )}
-                </button>
+                {error && <Error message={error} />}
               </div>
-
-              {/* Controls Section */}
               <div className="p-6 space-y-4">
-                {/* Device Selection */}
                 {devices.length > 0 && (
                   <div className="space-y-2">
                     <label htmlFor="camera-select" className="text-sm font-medium text-gray-700">
@@ -271,29 +365,7 @@ export default function CameraCapture(): JSX.Element {
                     </select>
                   </div>
                 )}
-
-                {/* Action Buttons */}
                 <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                  <Button
-                    onClick={() => startCamera(selectedDeviceId)}
-                    variant="primary"
-                    size="md"
-                    fullWidth
-                    className="flex-1"
-                  >
-                    {t("camera.start")}
-                  </Button>
-
-                  <Button
-                    onClick={stopCamera}
-                    variant="secondary"
-                    size="md"
-                    fullWidth
-                    className="flex-1"
-                  >
-                    {t("camera.stop")}
-                  </Button>
-
                   <Button
                     onClick={toggleFacing}
                     variant="secondary"
@@ -304,10 +376,6 @@ export default function CameraCapture(): JSX.Element {
                     <RotateCw className="w-5 h-5" />
                     {t("camera.toggle")}
                   </Button>
-                </div>
-
-                {/* Capture & Import */}
-                <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
                   <Button
                     onClick={capturePhoto}
                     variant="primary"
@@ -318,81 +386,112 @@ export default function CameraCapture(): JSX.Element {
                     <Camera className="w-5 h-5" />
                     {t("camera.capture")}
                   </Button>
-
-                  <label className="flex-1">
-                    <Button
-                      as="span"
-                      variant="secondary"
-                      size="md"
-                      fullWidth
-                      className="flex items-center justify-center gap-2 cursor-pointer"
-                    >
-                      {t("camera.import")}
-                    </Button>
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="image/*"
-                      onChange={onFileChange}
-                      className="hidden"
-                      aria-label={t("camera.importImage")}
-                    />
-                  </label>
                 </div>
               </div>
             </div>
           </div>
+        )}
 
-          {/* Preview Section */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl shadow-lg p-6 sticky top-24">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">{t("camera.preview")}</h3>
-
-              {capturedDataUrl ? (
-                <>
-                  <img
-                    src={capturedDataUrl}
-                    alt={t("camera.previewAlt")}
-                    className="w-full rounded-xl object-contain mb-4 shadow-md"
-                  />
-
-                  <div className="space-y-3">
-                    <Button
-                      onClick={downloadCaptured}
-                      variant="primary"
-                      size="md"
-                      fullWidth
-                      className="flex items-center justify-center gap-2"
-                    >
-                      <Download className="w-5 h-5" />
-                      {t("camera.download")}
-                    </Button>
-
-                    <Button
-                      onClick={() => setCapturedDataUrl(null)}
-                      variant="secondary"
-                      size="md"
-                      fullWidth
-                      className="flex items-center justify-center gap-2"
-                    >
-                      <Trash2 className="w-5 h-5" />
-                      {t("camera.delete")}
-                    </Button>
-                  </div>
-                </>
-              ) : (
-                <div className="flex items-center justify-center h-64 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border-2 border-dashed border-gray-300">
+        {mode === "import" && (
+          <div className="max-w-2xl mx-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">{t("camera.importPhoto")}</h2>
+              <button
+                onClick={handleBack}
+                className="p-2 hover:bg-gray-200 rounded-full transition-colors"
+                aria-label="Close"
+              >
+                <X className="w-6 h-6 text-gray-700" />
+              </button>
+            </div>
+            <div className="bg-white rounded-2xl shadow-lg p-8">
+              <label className="block">
+                <div className="flex flex-col items-center justify-center h-80 border-2 border-dashed border-gray-300 rounded-xl hover:border-[#A50034] hover:bg-[#A50034]/5 transition-all cursor-pointer">
                   <div className="text-center">
-                    <Camera className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-                    <p className="text-sm text-gray-500">{t("camera.noCaptured")}</p>
+                    <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-lg font-medium text-gray-700">{t("camera.dropImage")}</p>
+                    <p className="text-sm text-gray-500 mt-2">{t("camera.selectImage")}</p>
                   </div>
                 </div>
-              )}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={onFileChange}
+                  className="hidden"
+                  aria-label={t("camera.importImage")}
+                />
+              </label>
+              {error && <Error message={error} />}
             </div>
           </div>
-        </div>
-      </main>
+        )}
 
+        {mode === "preview" && capturedDataUrl && (
+          <div className="max-w-2xl mx-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">{t("camera.preview")}</h2>
+              <button
+                onClick={handleBack}
+                disabled={isUploading}
+                className="p-2 hover:bg-gray-200 rounded-full transition-colors disabled:opacity-50"
+                aria-label="Close"
+              >
+                <X className="w-6 h-6 text-gray-700" />
+              </button>
+            </div>
+            <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+              <div className="p-6">
+                <img
+                  src={capturedDataUrl}
+                  alt={t("camera.previewAlt")}
+                  className="w-full rounded-xl object-contain mb-6 shadow-md"
+                />
+                <div className="space-y-3">
+                  <Button
+                    onClick={uploadPhoto}
+                    disabled={isUploading}
+                    variant="primary"
+                    size="md"
+                    fullWidth
+                    className="flex items-center justify-center gap-2"
+                  >
+                    <Upload className="w-5 h-5" />
+                    {isUploading ? t("camera.uploading") || "Upload..." : t("camera.upload") || "Télécharger"}
+                  </Button>
+                  <Button
+                    onClick={downloadCaptured}
+                    variant="secondary"
+                    size="md"
+                    fullWidth
+                    className="flex items-center justify-center gap-2"
+                  >
+                    <Download className="w-5 h-5" />
+                    {t("camera.download")}
+                  </Button>
+                  <Button
+                    onClick={handleBack}
+                    disabled={isUploading}
+                    variant="secondary"
+                    size="md"
+                    fullWidth
+                    className="flex items-center justify-center gap-2"
+                  >
+                    <X className="w-5 h-5" />
+                    {t("camera.back")}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        <Notification
+          message={notification.message}
+          type={notification.type}
+          isVisible={notification.isVisible}
+          onClose={closeNotification}
+        />
+      </main>
       {/* Hidden Canvas */}
       <canvas ref={canvasRef} className="hidden" />
     </div>

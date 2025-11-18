@@ -7,21 +7,22 @@ from fastapi.responses import JSONResponse
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
+from s3_service import s3_service
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 import models
 import schemas
 from db import engine, get_db
-
+import os
 
 app = FastAPI(title="Smart Sorting API")
 
 models.Base.metadata.create_all(bind=engine)
 
-SECRET_KEY = "votre_clé_secrète_très_longue_et_sécurisée" 
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+SECRET_KEY = os.getenv("SECRET_KEY")
+ALGORITHM = os.getenv("ALGORITHM")
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30))
 
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
@@ -183,3 +184,81 @@ def login(request: Request, credentials: schemas.LoginRequest, response: Respons
 def logout(response: Response):
     response.delete_cookie(key="access_token")
     return {"message": "Logout successful"}
+
+@app.post("/photos/upload")
+def upload_photo(request: schemas.PhotoUploadRequest, current_user: models.User = Depends(get_current_user_from_cookie), db: Session = Depends(get_db)):
+    try:
+        if not request.image:
+            raise HTTPException(status_code=400, detail="Image manquante")
+        if request.source not in ["capture", "import"]:
+            raise HTTPException(status_code=400, detail="Source invalide")
+        
+        s3_result = s3_service.upload_image(
+            image_base64=request.image,
+            user_id=current_user.id,
+            source=request.source
+        )
+        
+        db_photo = models.Photo(
+            user_id=current_user.id,
+            filename=s3_result["filename"],
+            s3_url=s3_result["s3_url"],
+            source=request.source
+        )
+        db.add(db_photo)
+        db.commit()
+        db.refresh(db_photo)
+        
+        return {
+            "id": db_photo.id,
+            "filename": db_photo.filename,
+            "s3_url": db_photo.s3_url,
+            "message": "Photo uploadée avec succès"
+        }
+    
+    except HTTPException:
+        db.rollback()
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Erreur serveur: {str(e)}")
+
+@app.get("/photos", response_model=list[schemas.PhotoResponse])
+def get_user_photos(skip: int = 0, limit: int = 50, current_user: models.User = Depends(get_current_user_from_cookie), db: Session = Depends(get_db)):
+    photos = db.query(models.Photo).filter(
+        models.Photo.user_id == current_user.id
+    ).order_by(
+        models.Photo.uploaded_at.desc()
+    ).offset(skip).limit(limit).all()
+    
+    return photos
+
+@app.delete("/photos/{photo_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_photo( photo_id: int, current_user: models.User = Depends(get_current_user_from_cookie), db: Session = Depends(get_db)):
+    try:
+        photo = db.query(models.Photo).filter(
+            models.Photo.id == photo_id,
+            models.Photo.user_id == current_user.id
+        ).first()
+        
+        if not photo:
+            raise HTTPException(status_code=404, detail="Photo non trouvée")
+        
+        try:
+            s3_service.s3_client.delete_object(
+                Bucket=s3_service.bucket_name,
+                Key=photo.filename
+            )
+        except Exception as e:
+            print(f"Erreur suppression S3: {e}")
+        
+        db.delete(photo)
+        db.commit()
+        
+        return None
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))

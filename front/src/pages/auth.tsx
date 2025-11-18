@@ -121,7 +121,6 @@ export default function Auth() {
 
             <div className="relative z-10 flex items-center justify-center px-6 h-[calc(100vh-80px)]">
                 <div className="w-full max-w-md p-8 space-y-6 rounded-2xl shadow-2xl backdrop-blur-sm bg-white/90 dark:bg-gray-800/90 text-gray-900 dark:text-white">
-                    {/* <h1 className="text-3xl font-bold text-center">{t("login")}</h1> */}
                     <form className="space-y-4" onSubmit={submit} noValidate>
                         <div>
                             <Input

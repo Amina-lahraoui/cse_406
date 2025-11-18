@@ -1,6 +1,7 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional
 
+
 class UserBase(BaseModel):
     email: EmailStr
     language: Optional[str] = "en"
@@ -31,6 +32,20 @@ class TokenResponse(BaseModel):
     access_token: str
     token_type: str
     user: "UserResponse"
+    
+    class Config:
+        from_attributes = True
+
+class PhotoUploadRequest(BaseModel):
+    image: str
+    source: str
+
+class PhotoResponse(BaseModel):
+    id: int
+    filename: str
+    s3_url: str
+    source: str
+    uploaded_at: str
     
     class Config:
         from_attributes = True
