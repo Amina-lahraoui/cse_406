@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import { Input, Button, Notification } from "@/components";
+import { Input, Button } from "@/components";
 import { MapPin, Languages, Check } from 'lucide-react';
 
 export default function Forgot() {

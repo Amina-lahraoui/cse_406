@@ -11,7 +11,7 @@ import { Camera, Download, RotateCw, Languages, LogOut, X, Upload } from "lucide
 interface DeviceInfo extends MediaDeviceInfo {
   deviceId: string;
   label: string;
-  kind: string;
+  kind: MediaDeviceKind;
 }
 type PermissionState = "unknown" | "granted" | "denied";
 type FacingMode = "user" | "environment";
@@ -40,7 +40,7 @@ export default function CameraCapture() {
 
   const [mode, setMode] = useState<Mode>("select");
   const [previousMode, setPreviousMode] = useState<Mode | null>(null);
-  const [permissionState, setPermissionState] = useState<PermissionState>("unknown");
+  const [, setPermissionState] = useState<PermissionState>("unknown");
   const [facingMode, setFacingMode] = useState<FacingMode>("user");
   const [capturedDataUrl, setCapturedDataUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -135,7 +135,7 @@ const onFileChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
         setSelectedDeviceId(vids[0].deviceId);
       }
     } catch (err) {
-      setError(err)
+      setError("enumerateDevices error")
       console.warn("enumerateDevices error", err); // ???? remplacer par un setErrors ? 
     }
   };
