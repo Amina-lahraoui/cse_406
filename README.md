@@ -13,7 +13,7 @@ This project presents an AI-powered personal assistant designed to connect nutri
 
 
 
-<img width="1915" height="890" alt="image" src="https://github.com/user-attachments/assets/db579efa-b2a4-4de0-9048-634936708a4f" />
+<img width="1658" height="881" alt="image" src="https://github.com/user-attachments/assets/775a34e9-6bf6-4285-ba1b-db025263708b" />
 
 
 I. Introduction
