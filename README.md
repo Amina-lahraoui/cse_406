@@ -11,6 +11,11 @@ This project presents an AI-powered personal assistant designed to connect nutri
 | Shajnin Howlader         | Computer Science    | [Shajninhowlader@gmail.com)            |
 | Henrik Lam               | Computer Science    | [henriklam5555@gmail.com)              |
 
+
+
+<img width="1658" height="881" alt="image" src="https://github.com/user-attachments/assets/775a34e9-6bf6-4285-ba1b-db025263708b" />
+
+
 I. Introduction
 
 - Coming to South Korea to study abroad, some of our members immediately noticed the prevalence of skincare, clinics, and skin analysis being offered at many stores to market their own products as a solution to any skin issues. We were inspired by skin analysis's and wanted to combine it with out coding and our assignment with working with an LG products. This is where the DermFridge AI came to be. 
